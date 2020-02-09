@@ -29,7 +29,6 @@ function _loadUrl(url) {
 const CACHE_PREFIX = 'pokeapi-cache'
 
 export default url => {
-    console.log('request')
     return new Promise((resolve, reject) => {
         localForage
             .ready()

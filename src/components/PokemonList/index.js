@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { useStore } from 'store'
 import ElemView from './elemView'
 import Header from './header'
-import Pagination from './pagination'
+import Toolbar from './toolbar'
 import { Page } from 'components/ui'
 
 import Grid from '@material-ui/core/Grid'
@@ -22,7 +22,7 @@ const PokemonList = ({ page = 0 }) => {
     }
     return (
         <Page header={<Header />}>
-            <Pagination pagination={pagination} currentPage={page} />
+            <Toolbar pagination={pagination} currentPage={page} />
             <Grid container spacing={3}>
                 {pagination.items.map(item => (
                     <Grid item key={item} xs={matches ? 4 : 12}>
@@ -30,7 +30,7 @@ const PokemonList = ({ page = 0 }) => {
                     </Grid>
                 ))}
             </Grid>
-            <Pagination pagination={pagination} currentPage={page} />
+            <Toolbar pagination={pagination} currentPage={page} />
         </Page>
     )
 }

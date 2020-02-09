@@ -22,6 +22,16 @@ const useStyles = makeStyles(theme => ({
     },
     outerBox: {
         display: 'flex',
+        alignItems: 'center',
+        '& > *:not(:last-child)': {
+            marginRight: '15px',
+        },
+    },
+    tag: {
+        color: 'white',
+        borderRadius: '10px',
+        backgroundColor: 'pink',
+        padding: '5px 10px',
         '&:not(:last-child)': {
             marginRight: '10px',
         },
@@ -51,9 +61,21 @@ const ElemView = ({ name }) => {
                             <Typography gutterBottom variant="h5" component="h2">
                                 {data.name}
                             </Typography>
-                            <Typography variant="body2" color="textSecondary" component="p">
-                                {data.types && data.types.map(item => item.type.name).join(', ')}
-                            </Typography>
+                            {data.types && (
+                                <Box display="flex">
+                                    {data.types.map(item => (
+                                        <Typography
+                                            key={item.type.name}
+                                            className={classes.tag}
+                                            variant="body2"
+                                            color="textSecondary"
+                                            component="p"
+                                        >
+                                            {item.type.name}
+                                        </Typography>
+                                    ))}
+                                </Box>
+                            )}
                         </Box>
                     </Box>
                 </CardContent>

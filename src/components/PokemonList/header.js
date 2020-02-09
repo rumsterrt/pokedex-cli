@@ -1,26 +1,110 @@
 import React from 'react'
-import { useHistory } from 'react-router-dom'
-import _get from 'lodash/get'
+import { observer } from 'mobx-react-lite'
+import { useStore } from 'store'
+import { Select } from 'components/ui'
 
-import { makeStyles } from '@material-ui/core/styles'
-import Button from '@material-ui/core/Button'
-import Fab from '@material-ui/core/Fab'
-import Drawer from '@material-ui/core/Drawer'
-import useMediaQuery from '@material-ui/core/useMediaQuery'
-import IconButton from '@material-ui/core/IconButton'
-import Divider from '@material-ui/core/Divider'
-import Box from '@material-ui/core/Box'
+import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
+import InputBase from '@material-ui/core/InputBase'
+import { fade, makeStyles } from '@material-ui/core/styles'
+import SearchIcon from '@material-ui/icons/Search'
 
-import ChevronRightIcon from '@material-ui/icons/ChevronRight'
+const useStyles = makeStyles(theme => ({
+    menuButton: {
+        marginRight: theme.spacing(2),
+    },
+    title: {
+        flexGrow: 1,
+        display: 'none',
+        [theme.breakpoints.up('sm')]: {
+            display: 'block',
+        },
+    },
+    search: {
+        position: 'relative',
+        borderRadius: theme.shape.borderRadius,
+        backgroundColor: fade(theme.palette.common.white, 0.15),
+        '&:hover': {
+            backgroundColor: fade(theme.palette.common.white, 0.25),
+        },
+        marginLeft: 0,
+        width: '100%',
+        [theme.breakpoints.up('sm')]: {
+            marginLeft: theme.spacing(1),
+            width: 'auto',
+        },
+    },
+    searchIcon: {
+        width: theme.spacing(7),
+        height: '100%',
+        position: 'absolute',
+        pointerEvents: 'none',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    inputRoot: {
+        color: 'inherit',
+    },
+    inputInput: {
+        padding: theme.spacing(1, 1, 1, 7),
+        transition: theme.transitions.create('width'),
+        width: '100%',
+        [theme.breakpoints.up('sm')]: {
+            width: 120,
+            '&:focus': {
+                width: 200,
+            },
+        },
+    },
+}))
 
-const useStyles = makeStyles(theme => ({}))
+const SearchAppBar = () => {
+    const classes = useStyles()
+    const { pokemonStore } = useStore()
+    const [value, setValue] = React.useState('')
+    const [types, setTypes] = React.useState([])
+    const handleSubmit = e => {
+        console.log('e', e.key)
+        if (e.key != 'Enter') {
+            return
+        }
+        pokemonStore.updatePagination({ search: value })
+    }
 
-const Header = () => {
     return (
-        <>
-            <div>Header</div>
-        </>
+        <Toolbar>
+            <Typography className={classes.title} variant="h6" noWrap>
+                POKEDEX
+            </Typography>
+            <div className={classes.search}>
+                <div className={classes.searchIcon}>
+                    <SearchIcon />
+                </div>
+                <InputBase
+                    onKeyDown={handleSubmit}
+                    placeholder="Search…"
+                    value={value}
+                    onChange={e => setValue(e.target.value)}
+                    classes={{
+                        root: classes.inputRoot,
+                        input: classes.inputInput,
+                    }}
+                    inputProps={{ 'aria-label': 'search' }}
+                />
+            </div>
+            <Select
+                value={types}
+                onChange={e => {
+                    setTypes(e.target.value)
+                    pokemonStore.updatePagination({ types: e.target.value })
+                }}
+                label="Types"
+                multiple
+                options={pokemonStore.types.map(item => ({ label: item, value: item }))}
+            />
+        </Toolbar>
     )
 }
 
-export default Header
+export default observer(SearchAppBar)

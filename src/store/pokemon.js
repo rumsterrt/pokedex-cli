@@ -2,6 +2,7 @@ import request from 'utils/request'
 import { log } from 'utils/log'
 import _get from 'lodash/get'
 import _isEqual from 'lodash/isEqual'
+import _intersection from 'lodash/intersection'
 import { toJS } from 'mobx'
 const PokedexStore = () => {
     return {
@@ -10,19 +11,41 @@ const PokedexStore = () => {
         isLoaded: false,
         error: null,
         itemsDetails: {},
-        types: {},
+        _types: [],
         pagination: {
             limit: 10,
-            filter: false,
+            search: '',
+            types: null,
+        },
+
+        _calcPaginationItems(page) {
+            let items = [...this.items]
+            const { search, types, limit } = this.pagination
+            const searchUpp = search.toUpperCase()
+
+            if (search || (types && types.length > 0)) {
+                items = items.filter(item => {
+                    const localTypes = _get(this.itemsDetails, `${item}.types`, []).map(item => item.type.name)
+                    return (
+                        (!search || item.toUpperCase().indexOf(searchUpp) > -1) &&
+                        (!(types && types.length > 0) || _intersection(types, localTypes).length > 0)
+                    )
+                })
+            }
+
+            const total = items.length
+            return { items: items.slice((page - 1) * limit, (page - 1) * limit + limit), total }
         },
 
         getPagination(page = 1) {
-            const limit = this.pagination.limit
             return {
                 ...this.pagination,
-                total: this.items.length,
-                items: this.items.slice((page - 1) * limit, (page - 1) * limit + limit),
+                ...this._calcPaginationItems(page),
             }
+        },
+
+        get types() {
+            return this._types
         },
 
         async loadAllItemsIfNeeded() {
@@ -34,25 +57,28 @@ const PokedexStore = () => {
             }
             try {
                 this.isLoading = true
-                const count = (
-                    await request('pokemon', {
-                        params: { limit: 0 },
-                    })
-                ).count
-                let loadChunk = Promise.resolve()
-                for (let i = 0; i < count; i += 100) {
-                    loadChunk = loadChunk
-                        .then(() => request(`pokemon/?offset=${i}&limit=${100}`))
-                        .then(({ results }) => this.items.push(...results.map(item => item.name)))
-                }
-                loadChunk.then(() => {
-                    this.isLoaded = true
-                })
+                await this._loadByChunck('pokemon', this.items)
+                await this._loadByChunck('type', this._types)
+                this.isLoaded = true
             } catch (err) {
                 log('main store::nextPage: ', err)
             } finally {
                 this.isLoading = false
             }
+        },
+        async _loadByChunck(url, array) {
+            const count = (
+                await request(url, {
+                    params: { limit: 0 },
+                })
+            ).count
+            let loadChunk = Promise.resolve()
+            for (let i = 0; i < count; i += 100) {
+                loadChunk = loadChunk
+                    .then(() => request(`${url}/?offset=${i}&limit=${100}`))
+                    .then(({ results }) => array.push(...results.map(item => item.name)))
+            }
+            return loadChunk
         },
 
         updatePagination(params) {
