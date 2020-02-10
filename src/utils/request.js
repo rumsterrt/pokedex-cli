@@ -28,7 +28,7 @@ function _loadUrl(url) {
 
 const CACHE_PREFIX = 'pokeapi-cache'
 
-export default url => {
+const request = url => {
     return new Promise((resolve, reject) => {
         localForage
             .ready()
@@ -46,6 +46,11 @@ export default url => {
             .catch(err => {
                 log('request >>>>>>>>>>>>>>>>>>>>>>', { error: err })
                 reject(err)
+                if (err.code === 'ECONNABORTED') {
+                    setTimeout(() => request(url), 1000)
+                }
             })
     })
 }
+
+export default request
