@@ -1,38 +1,39 @@
 import React from 'react'
 import styled from 'styled-components'
-import { useHistory } from 'react-router-dom'
 import _uniq from 'lodash/uniq'
 
 import Box from '@material-ui/core/Box'
 import Button from '@material-ui/core/Button'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
 
-const fetchPageNumbers = (count, page) => {
-    return _uniq([1, 2, +page - 1, +page, +page + 1, count - 1, count]).reduce((acc, item, index, arr) => {
-        if (item <= 0 || item > count) {
-            return acc
-        }
-        if (index > 0 && item != arr[index - 1] + 1) {
-            return [...acc, '...', item]
-        }
-        return [...acc, item]
-    }, [])
-}
+import NavigatePrev from '@material-ui/icons/NavigateBefore'
+import NavigateNext from '@material-ui/icons/NavigateNext'
+import NavigateFirst from '@material-ui/icons/SkipPrevious'
+import NavigateLast from '@material-ui/icons/SkipNext'
 
-const Pagination = ({ total, limit, currentPage, onClick = () => {} }) => {
-    const history = useHistory()
-    const [pages, setPages] = React.useState([])
-
-    React.useEffect(() => {
-        setPages(fetchPageNumbers(Math.round(total / limit), currentPage))
-    }, [total, limit, currentPage])
+const Pagination = ({ totalPages, limit, currentPage, onClick = () => {}, ...rest }) => {
+    const isDisabledLeft = currentPage == 1
+    const isDisabledRight = currentPage == totalPages
 
     return (
-        <Box display="flex">
-            {pages.map((page, index) => (
-                <Button disabled={page == currentPage || page == '...'} key={index} onClick={onClick.bind(null, page)}>
-                    {page}
-                </Button>
-            ))}
+        <Box display="flex" alignItems="center" justifyContent="center" {...rest}>
+            <NavigateFirst
+                color={isDisabledLeft ? 'disabled' : 'inherit'}
+                onClick={() => isDisabledLeft || onClick(1)}
+            />
+            <NavigatePrev
+                color={isDisabledLeft ? 'disabled' : 'inherit'}
+                onClick={() => isDisabledLeft || onClick(+currentPage - 1)}
+            />
+            {currentPage}
+            <NavigateNext
+                color={isDisabledRight ? 'disabled' : 'inherit'}
+                onClick={() => isDisabledRight || onClick(+currentPage + 1)}
+            />
+            <NavigateLast
+                color={isDisabledRight ? 'disabled' : 'inherit'}
+                onClick={() => isDisabledRight || onClick(totalPages)}
+            />
         </Box>
     )
 }

@@ -34,7 +34,11 @@ const PokedexStore = () => {
             }
 
             const total = items.length
-            return { items: items.slice((page - 1) * limit, (page - 1) * limit + limit), total }
+            return {
+                items: items.slice((page - 1) * limit, (page - 1) * limit + limit),
+                total,
+                totalPages: Math.ceil(total / limit),
+            }
         },
 
         getPagination(page = 1) {
@@ -80,12 +84,13 @@ const PokedexStore = () => {
             }
             return loadChunk
         },
-
+        //update only if new values were recieved
         updatePagination(params) {
             if (params && _isEqual(toJS(this.pagination), toJS(params))) {
-                return Promise.resolve()
+                return false
             }
             this.pagination = Object.keys(params || {}).length ? Object.assign(this.pagination || {}, params) : {}
+            return true
         },
 
         async loadDetailsIfNeeded(name) {

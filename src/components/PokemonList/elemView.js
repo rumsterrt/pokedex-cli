@@ -12,7 +12,6 @@ import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles(theme => ({
     card: {
-        width: '100%',
         backgroundColor: '#e1f5fe',
     },
     avatar: {
@@ -48,39 +47,33 @@ const ElemView = ({ name }) => {
     }, [name])
 
     return (
-        <>
-            <Card className={classes.card}>
-                <CardContent>
-                    <Box className={classes.outerBox}>
-                        <Avatar
-                            className={classes.avatar}
-                            alt="Remy Sharp"
-                            src={_get(data, 'sprites.front_default', '')}
-                        />
-                        <Box className={classes.innerBox}>
-                            <Typography gutterBottom variant="h5" component="h2">
-                                {data.name}
-                            </Typography>
-                            {data.types && (
-                                <Box display="flex">
-                                    {data.types.map(item => (
-                                        <Typography
-                                            key={item.type.name}
-                                            className={classes.tag}
-                                            variant="body2"
-                                            color="textSecondary"
-                                            component="p"
-                                        >
-                                            {item.type.name}
-                                        </Typography>
-                                    ))}
-                                </Box>
-                            )}
-                        </Box>
+        <Card className={classes.card}>
+            <CardContent>
+                <Box className={classes.outerBox}>
+                    <Avatar className={classes.avatar} alt="Remy Sharp" src={_get(data, 'sprites.front_default', '')} />
+                    <Box className={classes.innerBox}>
+                        <Typography gutterBottom variant="h5" component="h2">
+                            {data.name}
+                        </Typography>
+                        {data.types && (
+                            <Box display="flex">
+                                {data.types.map(item => (
+                                    <Typography
+                                        key={item.type.name}
+                                        className={classes.tag}
+                                        variant="body2"
+                                        color="textSecondary"
+                                        component="p"
+                                    >
+                                        {item.type.name}
+                                    </Typography>
+                                ))}
+                            </Box>
+                        )}
                     </Box>
-                </CardContent>
-            </Card>
-        </>
+                </Box>
+            </CardContent>
+        </Card>
     )
 }
 

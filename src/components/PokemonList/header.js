@@ -1,110 +1,79 @@
 import React from 'react'
-import { observer } from 'mobx-react-lite'
 import { useStore } from 'store'
-import { Select } from 'components/ui'
+import { useHistory } from 'react-router-dom'
 
 import Toolbar from '@material-ui/core/Toolbar'
-import Typography from '@material-ui/core/Typography'
+import { makeStyles } from '@material-ui/core/styles'
+import Paper from '@material-ui/core/Paper'
 import InputBase from '@material-ui/core/InputBase'
-import { fade, makeStyles } from '@material-ui/core/styles'
+import Divider from '@material-ui/core/Divider'
+import IconButton from '@material-ui/core/IconButton'
 import SearchIcon from '@material-ui/icons/Search'
 
 const useStyles = makeStyles(theme => ({
-    menuButton: {
-        marginRight: theme.spacing(2),
-    },
-    title: {
-        flexGrow: 1,
-        display: 'none',
-        [theme.breakpoints.up('sm')]: {
-            display: 'block',
-        },
-    },
-    search: {
-        position: 'relative',
-        borderRadius: theme.shape.borderRadius,
-        backgroundColor: fade(theme.palette.common.white, 0.15),
-        '&:hover': {
-            backgroundColor: fade(theme.palette.common.white, 0.25),
-        },
-        marginLeft: 0,
-        width: '100%',
-        [theme.breakpoints.up('sm')]: {
-            marginLeft: theme.spacing(1),
-            width: 'auto',
-        },
-    },
-    searchIcon: {
-        width: theme.spacing(7),
-        height: '100%',
-        position: 'absolute',
-        pointerEvents: 'none',
+    root: {
+        padding: '2px 4px',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
     },
-    inputRoot: {
-        color: 'inherit',
+    input: {
+        marginLeft: theme.spacing(1),
+        flex: 1,
     },
-    inputInput: {
-        padding: theme.spacing(1, 1, 1, 7),
-        transition: theme.transitions.create('width'),
-        width: '100%',
-        [theme.breakpoints.up('sm')]: {
-            width: 120,
-            '&:focus': {
-                width: 200,
-            },
-        },
+    iconButton: {
+        padding: 10,
+    },
+
+    divider: {
+        height: 28,
+        margin: 4,
     },
 }))
 
 const SearchAppBar = () => {
+    const history = useHistory()
     const classes = useStyles()
     const { pokemonStore } = useStore()
     const [value, setValue] = React.useState('')
-    const [types, setTypes] = React.useState([])
+
+    const updatePagination = value => {
+        pokemonStore.updatePagination({ search: value }) && history.push('/page/1')
+    }
+
     const handleSubmit = e => {
-        console.log('e', e.key)
         if (e.key != 'Enter') {
             return
         }
-        pokemonStore.updatePagination({ search: value })
+        updatePagination(value)
+    }
+
+    const handleChange = e => {
+        setValue(e.target.value)
+        if (e.target.value) {
+            return
+        }
+        updatePagination('')
     }
 
     return (
         <Toolbar>
-            <Typography className={classes.title} variant="h6" noWrap>
-                POKEDEX
-            </Typography>
-            <div className={classes.search}>
-                <div className={classes.searchIcon}>
-                    <SearchIcon />
-                </div>
+            <Paper component="form" className={classes.root}>
                 <InputBase
+                    className={classes.input}
                     onKeyDown={handleSubmit}
                     placeholder="Search…"
                     value={value}
-                    onChange={e => setValue(e.target.value)}
-                    classes={{
-                        root: classes.inputRoot,
-                        input: classes.inputInput,
-                    }}
+                    type="search"
+                    onChange={handleChange}
                     inputProps={{ 'aria-label': 'search' }}
                 />
-            </div>
-            <Select
-                value={types}
-                onChange={e => {
-                    setTypes(e.target.value)
-                    pokemonStore.updatePagination({ types: e.target.value })
-                }}
-                label="Types"
-                multiple
-                options={pokemonStore.types.map(item => ({ label: item, value: item }))}
-            />
+                <Divider className={classes.divider} orientation="vertical" />
+                <IconButton color="primary" className={classes.iconButton} onClick={handleSubmit}>
+                    <SearchIcon />
+                </IconButton>
+            </Paper>
         </Toolbar>
     )
 }
 
-export default observer(SearchAppBar)
+export default SearchAppBar
