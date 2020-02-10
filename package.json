@@ -18,7 +18,7 @@
     "bugs": {
         "url": "https://github.com/rumsterrt/pokedex-cli/issues"
     },
-    "homepage": "https://github.com/rumsterrt/pokedex-cli#readme",
+    "homepage": "https://rumsterrt.github.io/pokedex",
     "devDependencies": {
         "@babel/core": "^7.8.4",
         "@babel/plugin-proposal-decorators": "^7.8.3",
