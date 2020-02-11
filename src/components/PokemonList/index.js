@@ -6,9 +6,15 @@ import Header from './header'
 import Toolbar from './toolbar'
 import { Page } from 'components/ui'
 import { Redirect } from 'react-router-dom'
+import styled from 'styled-components'
 
 import Grid from '@material-ui/core/Grid'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
+
+const Wrapper = styled.div`
+    flex-grow: 1;
+    padding: 10px;
+`
 
 const PokemonList = ({ page = 0 }) => {
     const matches = useMediaQuery('(min-width:1024px)')
@@ -28,14 +34,15 @@ const PokemonList = ({ page = 0 }) => {
     return (
         <Page header={<Header />}>
             <Toolbar pagination={pagination} currentPage={page} />
-
-            <Grid container spacing={3}>
-                {pagination.items.map(item => (
-                    <Grid item key={item} xs={matches ? 4 : 12}>
-                        <ElemView name={item} />
-                    </Grid>
-                ))}
-            </Grid>
+            <Wrapper>
+                <Grid container spacing={3}>
+                    {pagination.items.map(item => (
+                        <Grid item key={item} xs={matches ? 4 : 12}>
+                            <ElemView name={item} />
+                        </Grid>
+                    ))}
+                </Grid>
+            </Wrapper>
         </Page>
     )
 }

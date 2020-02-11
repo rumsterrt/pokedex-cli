@@ -15,13 +15,13 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: '#e1f5fe',
     },
     avatar: {
-        width: theme.spacing(7),
-        height: theme.spacing(7),
+        width: theme.spacing(10),
+        height: theme.spacing(10),
         backgroundColor: 'white',
     },
     outerBox: {
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'start',
         '& > *:not(:last-child)': {
             marginRight: '15px',
         },
@@ -51,20 +51,14 @@ const ElemView = ({ name }) => {
             <CardContent>
                 <Box className={classes.outerBox}>
                     <Avatar className={classes.avatar} alt="Remy Sharp" src={_get(data, 'sprites.front_default', '')} />
-                    <Box className={classes.innerBox}>
+                    <Box>
                         <Typography gutterBottom variant="h5" component="h2">
-                            {data.name}
+                            {name}
                         </Typography>
                         {data.types && (
                             <Box display="flex">
                                 {data.types.map(item => (
-                                    <Typography
-                                        key={item.type.name}
-                                        className={classes.tag}
-                                        variant="body2"
-                                        color="textSecondary"
-                                        component="p"
-                                    >
+                                    <Typography key={item.type.name} className={classes.tag} component="p">
                                         {item.type.name}
                                     </Typography>
                                 ))}

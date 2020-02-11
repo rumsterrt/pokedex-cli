@@ -2,9 +2,10 @@ import axios from 'axios'
 import localForage from 'localforage'
 import { log } from './log'
 import _get from 'lodash/get'
+import config from '../../config'
 
-axios.defaults.timeout = (process.env.REACT_APP_BACKEND_TIMEOUT || 5) * 1000
-axios.defaults.baseURL = 'https://pokeapi.co/api/v2/'
+axios.defaults.timeout = (config.BACKEND_TIMEOUT || 5) * 1000
+axios.defaults.baseURL = config.API_URI
 
 function _loadUrl(url) {
     return new Promise((resolve, reject) => {
@@ -27,8 +28,9 @@ function _loadUrl(url) {
 }
 
 const CACHE_PREFIX = 'pokeapi-cache'
+const attemptDelays = [1000, 5000, 10000]
 
-const request = url => {
+const request = (url, attemptNum = 0) => {
     return new Promise((resolve, reject) => {
         localForage
             .ready()
@@ -44,10 +46,12 @@ const request = url => {
             })
             .then(result => resolve(result))
             .catch(err => {
-                log('request >>>>>>>>>>>>>>>>>>>>>>', { error: err })
-                reject(err)
-                if (err.code === 'ECONNABORTED') {
-                    setTimeout(() => request(url), 1000)
+                if (err.code === 'ECONNABORTED' && attemptNum < attemptDelays.length) {
+                    log(`request retry ${attemptNum}`, url)
+                    setTimeout(() => request(url, attemptNum + 1), attemptDelays[attemptNum])
+                } else {
+                    log('request error', { error: err })
+                    reject(err)
                 }
             })
     })

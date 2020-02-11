@@ -68,7 +68,7 @@ const SearchAppBar = () => {
                     inputProps={{ 'aria-label': 'search' }}
                 />
                 <Divider className={classes.divider} orientation="vertical" />
-                <IconButton color="primary" className={classes.iconButton} onClick={handleSubmit}>
+                <IconButton color="primary" className={classes.iconButton} onClick={updatePagination.bind(null, value)}>
                     <SearchIcon />
                 </IconButton>
             </Paper>
